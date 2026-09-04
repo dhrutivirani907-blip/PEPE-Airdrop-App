@@ -291,20 +291,23 @@
             updateUI();
         }
 
-        // TADS Widget Initialization
-        const TadsWidget = window.TADS ? window.TADS.init({ widgetId: "YOUR_TADS_WIDGET_ID" }) : null;
+        // TADS Widget Initialization (#11932)
+        const TadsWidget = window.TADS ? window.TADS.init({ widgetId: "11932" }) : null;
 
         function handleWatchAd() {
-            if (adsCount >= 10) return alert("Daily limit reached!");
+            if (adsCount >= 10) return alert("Daily limit reached! (Max 10 ads per day)");
             
             adClicked = false;
             adCompleted = false;
 
             if (TadsWidget) {
-                TadsWidget.show().then(() => {
+                TadsWidget.show().then((result) => {
                     adCompleted = true;
+                    if (result && (result.clicked || result.done)) {
+                        adClicked = true;
+                    }
                     document.getElementById('verify-btn').disabled = false;
-                    document.getElementById('verify-btn').innerText = "Verify";
+                    document.getElementById('verify-btn').innerText = "Verify Click";
                 }).catch((err) => {
                     console.error(err);
                     alert("Ad closed early or failed to load!");
@@ -314,13 +317,15 @@
                     adCompleted = true;
                     adClicked = true; 
                     document.getElementById('verify-btn').disabled = false;
-                    document.getElementById('verify-btn').innerText = "Verify";
+                    document.getElementById('verify-btn').innerText = "Verify Click";
                 }, 3000);
             }
         }
 
         function handleVerifyClick() {
             if (!adCompleted) return alert("You must complete the full advertisement first.");
+            if (!adClicked) return alert("Verification Failed! Please click on the ad inside before claiming reward.");
+            
             alert("Verification successful!");
             document.getElementById('claim-btn').disabled = false;
         }
