@@ -1,11 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- 404 Redirection Script (Base domain kholne par auto-redirect karega) -->
+    <script>
+      if (window.location.pathname === '/' || window.location.pathname === '') {
+        window.location.href = '/PEPE-Airdrop-App/';
+      }
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pepe Airdrop</title>
-    <!-- Adsgram SDK -->
-    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+    
+    <!-- TADS SDK -->
+    <script src="https://tads.me/sdk.js"></script>
+
     <style>
         :root {
             --bg-color: #0d1117;
@@ -282,7 +291,8 @@
             updateUI();
         }
 
-        const AdController = window.Adsgram ? window.Adsgram.init({ blockId: "YOUR_BLOCK_ID" }) : null;
+        // TADS Widget Initialization
+        const TadsWidget = window.TADS ? window.TADS.init({ widgetId: "YOUR_TADS_WIDGET_ID" }) : null;
 
         function handleWatchAd() {
             if (adsCount >= 10) return alert("Daily limit reached!");
@@ -290,14 +300,15 @@
             adClicked = false;
             adCompleted = false;
 
-            if (AdController) {
-                AdController.show().then((result) => {
+            if (TadsWidget) {
+                TadsWidget.show().then(() => {
                     adCompleted = true;
-                    if (result.done) {
-                        document.getElementById('verify-btn').disabled = false;
-                        document.getElementById('verify-btn').innerText = "Verify";
-                    }
-                }).catch(() => alert("Ad closed early or not completed properly!"));
+                    document.getElementById('verify-btn').disabled = false;
+                    document.getElementById('verify-btn').innerText = "Verify";
+                }).catch((err) => {
+                    console.error(err);
+                    alert("Ad closed early or failed to load!");
+                });
             } else {
                 setTimeout(() => {
                     adCompleted = true;
@@ -328,7 +339,6 @@
             alert("Success! 1,000 PEPE added to your balance.");
         }
 
-        // Updated with live Render Backend URL
         function submitWithdrawal() {
             const amount = parseInt(document.getElementById('withdraw-amount').value);
             const address = document.getElementById('withdraw-address').value;
